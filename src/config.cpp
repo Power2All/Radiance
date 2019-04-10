@@ -124,7 +124,95 @@ void settings::init() {
 	add("syslog_level", "info");
 	add("pid_file", "./radiance.pid");
 	add("daemon_user", "root");
-}
+
+	// Database Structure 'torrents'
+    add("db_torrents", "torrents");
+    add("db_torrents_id", "ID");
+    add("db_torrents_info_hash", "info_hash");
+    add("db_torrents_freetorrent", "freetorrent");
+    add("db_torrents_doubletorrent", "doubletorrent");
+    add("db_torrents_snatched", "Snatched");
+    add("db_torrents_seeders", "Seeders");
+    add("db_torrents_leechers", "Leechers");
+    add("db_torrents_balance", "Balance");
+    add("db_torrents_last_action", "last_action");
+
+    // Database Structure 'users_main'
+    add("db_users_main", "users_main");
+    add("db_users_main_id", "ID");
+    add("db_users_main_can_leech", "can_leech");
+    add("db_users_main_torrent_pass", "torrent_pass");
+    add("db_users_main_visible", "Visible");
+    add("db_users_main_track_ipv6", "track_ipv6");
+    add("db_users_main_personal_freeleech", "personal_freeleech");
+    add("db_users_main_personal_doubleseed", "personal_doubleseed");
+    add("db_users_main_enabled", "Enabled");
+    add("db_users_main_uploaded", "Uploaded");
+    add("db_users_main_downloaded", "Downloaded");
+    add("db_users_main_uploaded_daily", "UploadedDaily");
+    add("db_users_main_downloaded_daily", "DownloadedDaily");
+
+    // Database Structure 'users_slots'
+    add("db_users_slots", "users_slots");
+    add("db_users_slots_user_id", "UserID");
+    add("db_users_slots_free_leech", "FreeLeech");
+    add("db_users_slots_double_seed", "DoubleSeed");
+    add("db_users_slots_torrent_id", "TorrentID");
+
+    // Database Structure 'users_freeleeches'
+    add("db_users_freeleeches", "users_freeleeches");
+    add("db_users_freeleeches_user_id", "UserID");
+    add("db_users_freeleeches_torrent_id", "TorrentID");
+    add("db_users_freeleeches_downloaded", "Downloaded");
+    add("db_users_freeleeches_uploaded", "Uploaded");
+
+    // Database Structure 'xbt_files_users'
+    add("db_xbt_files_users", "xbt_files_users");
+    add("db_xbt_files_users_peer_id", "peer_id");
+    add("db_xbt_files_users_port", "port");
+    add("db_xbt_files_users_ipv4", "ipv4");
+    add("db_xbt_files_users_ipv6", "ipv6");
+    add("db_xbt_files_users_uploaded", "uploaded");
+    add("db_xbt_files_users_downloaded", "downloaded");
+    add("db_xbt_files_users_remaining", "remaining");
+    add("db_xbt_files_users_corrupt", "corrupt");
+    add("db_xbt_files_users_announced", "announced");
+    add("db_xbt_files_users_ctime", "ctime");
+    add("db_xbt_files_users_mtime", "mtime");
+    add("db_xbt_files_users_uid", "uid");
+    add("db_xbt_files_users_active", "active");
+    add("db_xbt_files_users_fid", "fid");
+    add("db_xbt_files_users_upspeed", "upspeed");
+    add("db_xbt_files_users_downspeed", "downspeed");
+    add("db_xbt_files_users_timespend", "timespend");
+    add("db_xbt_files_users_useragent", "useragent");
+
+    // Database Structure 'xbt_client_blacklist'
+    add("db_xbt_client_blacklist", "xbt_client_blacklist");
+    add("db_xbt_client_blacklist_peer_id", "peer_id");
+
+    // Database Structure 'xbt_snatched'
+    add("db_xbt_snatched", "xbt_snatched");
+    add("db_xbt_snatched_uid", "uid");
+    add("db_xbt_snatched_fid", "fid");
+    add("db_xbt_snatched_tstamp", "tstamp");
+    add("db_xbt_snatched_ipv4", "ipv4");
+    add("db_xbt_snatched_ipv6", "ipv6");
+
+    // Database Structure 'xbt_peers_history'
+    add("db_xbt_peers_history", "xbt_peers_history");
+    add("db_xbt_peers_history_uid", "uid");
+    add("db_xbt_peers_history_downloaded", "downloaded");
+    add("db_xbt_peers_history_remaining", "remaining");
+    add("db_xbt_peers_history_uploaded", "uploaded");
+    add("db_xbt_peers_history_upspeed", "upspeed");
+    add("db_xbt_peers_history_downspeed", "downspeed");
+    add("db_xbt_peers_history_timespent", "timespent");
+    add("db_xbt_peers_history_peer_id", "peer_id");
+    add("db_xbt_peers_history_ipv4", "ipv4");
+    add("db_xbt_peers_history_ipv6", "ipv6");
+    add("db_xbt_peers_history_fid", "fid");
+    add("db_xbt_peers_history_mtime", "mtime");}
 
 void options::init() {
 	add("SitewideFreeleechMode", "off");

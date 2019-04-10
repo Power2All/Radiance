@@ -52,6 +52,95 @@ class database {
 		bool u_active, t_active, p_active, s_active, h_active, tok_active;
 		bool readonly, load_peerlists, clear_peerlists, peers_history, snatched_history, files_peers;
 
+        // Database 'torrents'
+        std::string db_torrents;
+        std::string db_torrents_id;
+        std::string db_torrents_info_hash;
+        std::string db_torrents_freetorrent;
+        std::string db_torrents_doubletorrent;
+        std::string db_torrents_snatched;
+        std::string db_torrents_seeders;
+        std::string db_torrents_leechers;
+        std::string db_torrents_balance;
+        std::string db_torrents_last_action;
+
+        // Database 'users_main'
+        std::string db_users_main;
+        std::string db_users_main_id;
+        std::string db_users_main_can_leech;
+        std::string db_users_main_torrent_pass;
+        std::string db_users_main_visible;
+        std::string db_users_main_track_ipv6;
+        std::string db_users_main_personal_freeleech;
+        std::string db_users_main_personal_doubleseed;
+        std::string db_users_main_enabled;
+        std::string db_users_main_uploaded;
+        std::string db_users_main_downloaded;
+        std::string db_users_main_uploaded_daily;
+        std::string db_users_main_downloaded_daily;
+
+        // Database 'users_slots'
+        std::string db_users_slots;
+        std::string db_users_slots_user_id;
+        std::string db_users_slots_free_leech;
+        std::string db_users_slots_double_seed;
+        std::string db_users_slots_torrent_id;
+
+        // Database 'users_freeleeches'
+        std::string db_users_freeleeches;
+        std::string db_users_freeleeches_user_id;
+        std::string db_users_freeleeches_torrent_id;
+        std::string db_users_freeleeches_downloaded;
+        std::string db_users_freeleeches_uploaded;
+
+        // Database 'xbt_files_users'
+        std::string db_xbt_files_users;
+        std::string db_xbt_files_users_peer_id;
+        std::string db_xbt_files_users_port;
+        std::string db_xbt_files_users_ipv4;
+        std::string db_xbt_files_users_ipv6;
+        std::string db_xbt_files_users_uploaded;
+        std::string db_xbt_files_users_downloaded;
+        std::string db_xbt_files_users_remaining;
+        std::string db_xbt_files_users_corrupt;
+        std::string db_xbt_files_users_announced;
+        std::string db_xbt_files_users_ctime;
+        std::string db_xbt_files_users_mtime;
+        std::string db_xbt_files_users_uid;
+        std::string db_xbt_files_users_active;
+        std::string db_xbt_files_users_fid;
+        std::string db_xbt_files_users_upspeed;
+        std::string db_xbt_files_users_downspeed;
+        std::string db_xbt_files_users_timespend;
+        std::string db_xbt_files_users_useragent;
+
+        // Database 'xbt_client_blacklist'
+        std::string db_xbt_client_blacklist;
+        std::string db_xbt_client_blacklist_peer_id;
+
+        // Database 'xbt_snatched'
+        std::string db_xbt_snatched;
+        std::string db_xbt_snatched_uid;
+        std::string db_xbt_snatched_fid;
+        std::string db_xbt_snatched_tstamp;
+        std::string db_xbt_snatched_ipv4;
+        std::string db_xbt_snatched_ipv6;
+
+        // Database 'xbt_peers_history'
+        std::string db_xbt_peers_history;
+        std::string db_xbt_peers_history_uid;
+        std::string db_xbt_peers_history_downloaded;
+        std::string db_xbt_peers_history_remaining;
+        std::string db_xbt_peers_history_uploaded;
+        std::string db_xbt_peers_history_upspeed;
+        std::string db_xbt_peers_history_downspeed;
+        std::string db_xbt_peers_history_timespent;
+        std::string db_xbt_peers_history_peer_id;
+        std::string db_xbt_peers_history_ipv4;
+        std::string db_xbt_peers_history_ipv6;
+        std::string db_xbt_peers_history_fid;
+        std::string db_xbt_peers_history_mtime;
+
 		// These locks prevent more than one thread from reading/writing the buffers.
 		// These should be held for the minimum time possible.
 		std::mutex user_queue_lock;
