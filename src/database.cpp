@@ -807,7 +807,6 @@ void database::flush_users() {
         update_user_buffer.clear();
         return;
     }
-    std::string sql;
     std::lock_guard <std::mutex> uq_lock(user_queue_lock);
     size_t qsize = user_queue.size();
     if (qsize > 0) {
@@ -816,24 +815,24 @@ void database::flush_users() {
     if (update_user_buffer == "") {
         return;
     }
-    // Similar to flush_torrents this can actually insert a new user entry into the DB.
-    // IT SHOULDN'T! And we shouldn't be deleting users either. This needs to change to
-    // an UPDATE transaction.
-    sql.append("INSERT INTO ")
-            .append(db_users_main).append(" (")
-            .append(db_users_main_id).append(", ")
-            .append(db_users_main_uploaded).append(", ")
-            .append(db_users_main_downloaded).append(", ")
-            .append(db_users_main_uploaded_daily).append(", ")
-            .append(db_users_main_downloaded_daily).append(") VALUES ")
-            .append(update_user_buffer)
-            .append(" ON DUPLICATE KEY UPDATE ")
-            .append(db_users_main_uploaded).append(" = ").append(db_users_main_uploaded).append(" + VALUES(").append(db_users_main_uploaded).append("), ")
-            .append(db_users_main_downloaded).append(" = ").append(db_users_main_downloaded).append(" + VALUES(").append(db_users_main_downloaded).append("), ")
-            .append(db_users_main_uploaded_daily).append(" = ").append(db_users_main_uploaded_daily).append(" + VALUES(").append(db_users_main_uploaded_daily).append("), ")
-            .append(db_users_main_downloaded_daily).append(" = ").append(db_users_main_downloaded_daily).append(" + VALUES(").append(db_users_main_downloaded_daily).append(");");
-    user_queue.push(sql);
-    stats.user_queue++;
+
+    auto update_user_buffer_vector1 = explode(update_user_buffer.substr(1, update_user_buffer.size() - 2), "),(");
+    for(auto n:update_user_buffer_vector1) {
+        auto update_user_buffer_vector2 = explode(n, ",");
+        std::string sqlupdate;
+        sqlupdate.append("UPDATE IGNORE ").append(db_users_main)
+                .append(" SET ")
+                .append(db_users_main_uploaded).append(" = ").append(db_users_main_uploaded).append(" + ").append(update_user_buffer_vector2[1]).append(", ")
+                .append(db_users_main_downloaded).append(" = ").append(db_users_main_downloaded).append(" + ").append(update_user_buffer_vector2[2]).append(", ")
+                .append(db_users_main_uploaded_daily).append(" = ").append(db_users_main_uploaded_daily).append(" + ").append(update_user_buffer_vector2[3]).append(", ")
+                .append(db_users_main_downloaded_daily).append(" = ").append(db_users_main_downloaded_daily).append(" + ").append(update_user_buffer_vector2[4])
+                .append(" WHERE ").append(db_users_main_id).append(" = ").append(update_user_buffer_vector2[0]).append(";");
+        torrent_queue.push(sqlupdate);
+        stats.torrent_queue++;
+        sqlupdate.clear();
+        update_user_buffer_vector2.clear();
+    }
+    update_user_buffer_vector1.clear();
     update_user_buffer.clear();
     if (!u_active) {
         std::thread thread(&database::do_flush, this, std::ref(u_active), std::ref(user_queue),
@@ -848,7 +847,6 @@ void database::flush_torrents() {
         update_torrent_buffer.clear();
         return;
     }
-    std::string sql;
     std::lock_guard <std::mutex> tq_lock(torrent_queue_lock);
     size_t qsize = torrent_queue.size();
     if (qsize > 0) {
@@ -859,17 +857,28 @@ void database::flush_torrents() {
         return;
     }
 
-    // This massive hack is because we can reinsert a deleted torrent. Tracker shouldn't
-    // be inserting at all, it should be using updates and transactions.
-    sql = "INSERT INTO torrents (ID,Seeders,Leechers,Snatched,Balance) VALUES " + update_torrent_buffer +
-          " ON DUPLICATE KEY UPDATE Seeders=VALUES(Seeders), Leechers=VALUES(Leechers), " +
-          "Snatched=Snatched+VALUES(Snatched), Balance=VALUES(Balance), last_action = " +
-          "IF(VALUES(Seeders) > 0, NOW(), last_action)";
-    torrent_queue.push(sql);
-    stats.torrent_queue++;
+    auto update_torrent_buffer_vector1 = explode(update_torrent_buffer.substr(1, update_torrent_buffer.size() - 2), "),(");
+    for(auto n:update_torrent_buffer_vector1) {
+        auto update_torrent_buffer_vector2 = explode(n, ",");
+        std::string sqlupdate;
+        sqlupdate.append("UPDATE IGNORE ").append(db_torrents)
+                .append(" SET ")
+                .append(db_torrents_seeders).append(" = ").append(update_torrent_buffer_vector2[1]).append(", ")
+                .append(db_torrents_leechers).append(" = ").append(update_torrent_buffer_vector2[2]).append(", ")
+                .append(db_torrents_snatched).append(" = ").append(db_torrents_snatched).append(" + ").append(update_torrent_buffer_vector2[3]).append(", ")
+                .append(db_torrents_balance).append(" = ").append(update_torrent_buffer_vector2[4]).append(", ")
+                .append(db_torrents_last_action).append(" = IF(").append(update_torrent_buffer_vector2[1]).append(" > 0, NOW(), ").append(db_torrents_last_action).append(")")
+                .append(" WHERE ").append(db_torrents_id).append(" = ").append(update_torrent_buffer_vector2[0]).append(";");
+        torrent_queue.push(sqlupdate);
+        stats.torrent_queue++;
+        sqlupdate.clear();
+        update_torrent_buffer_vector2.clear();
+    }
+    update_torrent_buffer_vector1.clear();
     update_torrent_buffer.clear();
-    sql.clear();
-    sql = "DELETE FROM torrents WHERE info_hash = ''";
+    // Just cleaning up the database for unexpected empty info_hash records
+    std::string sql;
+    sql.append("DELETE FROM ").append(db_torrents).append(" WHERE ").append(db_torrents_info_hash).append(" = '';");
     stats.torrent_queue++;
     torrent_queue.push(sql);
     if (!t_active) {
@@ -893,7 +902,12 @@ void database::flush_snatches() {
     if (update_snatch_buffer == "") {
         return;
     }
-    sql = "INSERT INTO xbt_snatched (uid, fid, tstamp, ipv4, ipv6) VALUES " + update_snatch_buffer;
+    sql.append("INSERT INTO ").append(db_xbt_snatched).append(" (")
+            .append(db_xbt_snatched_uid).append(", ")
+            .append(db_xbt_snatched_fid).append(", ")
+            .append(db_xbt_snatched_tstamp).append(", ")
+            .append(db_xbt_snatched_ipv4).append(", ")
+            .append(db_xbt_snatched_ipv6).append(") VALUES ").append(update_snatch_buffer);
     snatch_queue.push(sql);
     stats.snatch_queue++;
     update_snatch_buffer.clear();
