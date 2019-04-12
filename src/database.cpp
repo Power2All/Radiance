@@ -366,10 +366,10 @@ void database::load_users(user_list &users) {
     try {
         mysqlpp::Query query = conn->query();
         query << "SELECT um." << db_users_main_id << ", " << db_users_main_can_leech << ", " <<
-              db_users_main_torrent_pass << ", (" << db_users_main_visible << " = 0 OR u.IPID IS NULL) AS Protected, " <<
+              db_users_main_torrent_pass << ", (" << db_users_main_visible << " = 0) AS Protected, " <<
               db_users_main_track_ipv6 << ", " << db_users_main_personal_freeleech << ", " <<
-              db_users_main_personal_doubleseed << " FROM " << db_users_main << " AS um JOIN users as u ON um." <<
-              db_users_main_id << " = u.ID WHERE " << db_users_main_enabled << " = '1'";
+              db_users_main_personal_doubleseed << " FROM " << db_users_main << " AS um WHERE " <<
+              db_users_main_enabled << " = '1'";
         mysqlpp::StoreQueryResult res = query.store();
         size_t num_rows = res.num_rows();
         std::unordered_set <std::string> cur_keys;
