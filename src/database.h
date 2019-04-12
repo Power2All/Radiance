@@ -111,7 +111,7 @@ class database {
         std::string db_xbt_files_users_fid;
         std::string db_xbt_files_users_upspeed;
         std::string db_xbt_files_users_downspeed;
-        std::string db_xbt_files_users_timespend;
+        std::string db_xbt_files_users_timespent;
         std::string db_xbt_files_users_useragent;
 
         // Database 'xbt_client_blacklist'

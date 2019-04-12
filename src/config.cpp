@@ -184,7 +184,7 @@ void settings::init() {
     add("db_xbt_files_users_fid", "fid");
     add("db_xbt_files_users_upspeed", "upspeed");
     add("db_xbt_files_users_downspeed", "downspeed");
-    add("db_xbt_files_users_timespend", "timespend");
+    add("db_xbt_files_users_timespent", "timespent");
     add("db_xbt_files_users_useragent", "useragent");
 
     // Database Structure 'xbt_client_blacklist'

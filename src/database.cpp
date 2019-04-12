@@ -182,7 +182,7 @@ void database::load_config() {
     db_xbt_files_users_fid = conf->get_str("db_xbt_files_users_fid");
     db_xbt_files_users_upspeed = conf->get_str("db_xbt_files_users_upspeed");
     db_xbt_files_users_downspeed = conf->get_str("db_xbt_files_users_downspeed");
-    db_xbt_files_users_timespend = conf->get_str("db_xbt_files_users_timespend");
+    db_xbt_files_users_timespent = conf->get_str("db_xbt_files_users_timespent");
     db_xbt_files_users_useragent = conf->get_str("db_xbt_files_users_useragent");
 
     db_users_slots = conf->get_str("db_users_slots");
@@ -945,14 +945,39 @@ void database::flush_peers() {
             peer_queue.pop();
             stats.peer_queue--;
         }
-        sql = "INSERT INTO xbt_files_users (uid,fid,active,uploaded,downloaded,upspeed,downspeed,remaining,corrupt," +
-              std::string("timespent,ctime,mtime,announced,ipv4,ipv6,port,peer_id,useragent) VALUES ") +
-              update_peer_heavy_buffer +
-              " ON DUPLICATE KEY UPDATE active=VALUES(active), uploaded=VALUES(uploaded), " +
-              "downloaded=VALUES(downloaded), upspeed=VALUES(upspeed), " +
-              "downspeed=VALUES(downspeed), remaining=VALUES(remaining), " +
-              "corrupt=VALUES(corrupt), timespent=VALUES(timespent), " +
-              "announced=VALUES(announced), mtime=VALUES(mtime), port=VALUES(port)";
+        sql.append("INSERT INTO ").append(db_xbt_files_users).append(" (")
+                .append(db_xbt_files_users_uid).append(", ")
+                .append(db_xbt_files_users_fid).append(", ")
+                .append(db_xbt_files_users_active).append(", ")
+                .append(db_xbt_files_users_uploaded).append(", ")
+                .append(db_xbt_files_users_downloaded).append(", ")
+                .append(db_xbt_files_users_upspeed).append(", ")
+                .append(db_xbt_files_users_downspeed).append(", ")
+                .append(db_xbt_files_users_remaining).append(", ")
+                .append(db_xbt_files_users_corrupt).append(", ")
+                .append(db_xbt_files_users_timespent).append(", ")
+                .append(db_xbt_files_users_ctime).append(", ")
+                .append(db_xbt_files_users_mtime).append(", ")
+                .append(db_xbt_files_users_announced).append(", ")
+                .append(db_xbt_files_users_ipv4).append(", ")
+                .append(db_xbt_files_users_ipv6).append(", ")
+                .append(db_xbt_files_users_port).append(", ")
+                .append(db_xbt_files_users_peer_id).append(", ")
+                .append(db_xbt_files_users_useragent)
+                .append(") VALUES ")
+                .append(update_peer_heavy_buffer)
+                .append(" ON DUPLICATE KEY UPDATE ")
+                .append(db_xbt_files_users_active).append(" = VALUES(").append(db_xbt_files_users_active).append("), ")
+                .append(db_xbt_files_users_uploaded).append(" = VALUES(").append(db_xbt_files_users_uploaded).append("), ")
+                .append(db_xbt_files_users_downloaded).append(" = VALUES(").append(db_xbt_files_users_downloaded).append("), ")
+                .append(db_xbt_files_users_upspeed).append(" = VALUES(").append(db_xbt_files_users_upspeed).append("), ")
+                .append(db_xbt_files_users_downspeed).append(" = VALUES(").append(db_xbt_files_users_downspeed).append("), ")
+                .append(db_xbt_files_users_remaining).append(" = VALUES(").append(db_xbt_files_users_remaining).append("), ")
+                .append(db_xbt_files_users_corrupt).append(" = VALUES(").append(db_xbt_files_users_corrupt).append("), ")
+                .append(db_xbt_files_users_timespent).append(" = VALUES(").append(db_xbt_files_users_timespent).append("), ")
+                .append(db_xbt_files_users_announced).append(" = VALUES(").append(db_xbt_files_users_announced).append("), ")
+                .append(db_xbt_files_users_mtime).append(" = VALUES(").append(db_xbt_files_users_mtime).append("), ")
+                .append(db_xbt_files_users_port).append(" = VALUES(").append(db_xbt_files_users_port).append(");");
         peer_queue.push(sql);
         stats.peer_queue++;
         update_peer_heavy_buffer.clear();
@@ -964,10 +989,20 @@ void database::flush_peers() {
             peer_queue.pop();
             stats.peer_queue--;
         }
-        sql = "INSERT INTO xbt_files_users (uid,fid,timespent,mtime,announced,peer_id) VALUES " +
-              update_peer_light_buffer +
-              " ON DUPLICATE KEY UPDATE upspeed=0, downspeed=0, timespent=VALUES(timespent), " +
-              "announced=VALUES(announced), mtime=VALUES(mtime)";
+        sql.append("INSERT INTO ").append(db_xbt_files_users).append(" (")
+                .append(db_xbt_files_users_uid).append(", ")
+                .append(db_xbt_files_users_fid).append(", ")
+                .append(db_xbt_files_users_timespent).append(", ")
+                .append(db_xbt_files_users_mtime).append(", ")
+                .append(db_xbt_files_users_announced).append(", ")
+                .append(db_xbt_files_users_peer_id).append(") VALUES ")
+                .append(update_peer_light_buffer)
+                .append(" ON DUPLICATE KEY UPDATE ")
+                .append(db_xbt_files_users_upspeed).append(" = 0, ")
+                .append(db_xbt_files_users_downspeed).append(" = 0, ")
+                .append(db_xbt_files_users_timespent).append(" = VALUES(").append(db_xbt_files_users_timespent).append("), ")
+                .append(db_xbt_files_users_announced).append(" = VALUES(").append(db_xbt_files_users_announced).append("), ")
+                .append(db_xbt_files_users_mtime).append(" = VALUES(").append(db_xbt_files_users_mtime).append(");");
         peer_queue.push(sql);
         stats.peer_queue++;
         update_peer_light_buffer.clear();
@@ -992,8 +1027,20 @@ void database::flush_peer_hist() {
         return;
     }
 
-    sql = "INSERT IGNORE INTO xbt_peers_history (uid, downloaded, remaining, uploaded, upspeed, downspeed, timespent, peer_id, ipv4, ipv6, fid, mtime) VALUES " +
-          update_peer_hist_buffer;
+    sql.append("INSERT IGNORE INTO ").append(db_xbt_peers_history).append(" (")
+            .append(db_xbt_peers_history_uid).append(", ")
+            .append(db_xbt_peers_history_downloaded).append(", ")
+            .append(db_xbt_peers_history_remaining).append(", ")
+            .append(db_xbt_peers_history_uploaded).append(", ")
+            .append(db_xbt_peers_history_upspeed).append(", ")
+            .append(db_xbt_peers_history_downspeed).append(", ")
+            .append(db_xbt_peers_history_timespent).append(", ")
+            .append(db_xbt_peers_history_peer_id).append(", ")
+            .append(db_xbt_peers_history_ipv4).append(", ")
+            .append(db_xbt_peers_history_ipv6).append(", ")
+            .append(db_xbt_peers_history_fid).append(", ")
+            .append(db_xbt_peers_history_mtime).append(") VALUES ")
+            .append(update_peer_hist_buffer);
     peer_hist_queue.push(sql);
     stats.peer_hist_queue++;
     update_peer_hist_buffer.clear();
@@ -1018,8 +1065,15 @@ void database::flush_tokens() {
     if (update_token_buffer == "") {
         return;
     }
-    sql = "INSERT INTO users_freeleeches (UserID, TorrentID, Downloaded, Uploaded) VALUES " + update_token_buffer +
-          " ON DUPLICATE KEY UPDATE Downloaded = Downloaded + VALUES(Downloaded), Uploaded = Uploaded + VALUES(Uploaded)";
+    sql.append("INSERT INTO ").append(db_users_freeleeches).append(" (")
+            .append(db_users_freeleeches_user_id).append(", ")
+            .append(db_users_freeleeches_torrent_id).append(", ")
+            .append(db_users_freeleeches_downloaded).append(", ")
+            .append(db_users_freeleeches_uploaded).append(") VALUES ")
+            .append(update_token_buffer)
+            .append(" ON DUPLICATE KEY UPDATE ")
+            .append(db_users_freeleeches_downloaded).append(" = ").append(db_users_freeleeches_downloaded).append(" + VALUES(").append(db_users_freeleeches_downloaded).append("), ")
+            .append(db_users_freeleeches_uploaded).append(" = ").append(db_users_freeleeches_uploaded).append(" + VALUES(").append(db_users_freeleeches_uploaded).append(");");
     token_queue.push(sql);
     stats.token_queue++;
     update_token_buffer.clear();
