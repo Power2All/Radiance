@@ -58,8 +58,6 @@ void worker::reload_lists() {
 		// Reset user stats
 		user.second->reset_stats();
 	}
-	stats.seeders  = 0;
-	stats.leechers = 0;
 	db->load_peers(torrents_list, users_list);
 	db->load_blacklist(blacklist);
 	status = OPEN;
